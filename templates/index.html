@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors Lizard Spock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Black Ops One', 'Impact', sans-serif;
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a0a0a 40%, #0d0d0d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(139, 0, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            background: rgba(20, 10, 10, 0.85);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(139, 0, 0, 0.3), inset 0 0 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(139, 0, 0, 0.4);
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            text-align: center;
+            color: #c0c0c0;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+            letter-spacing: 2px;
+        }
+
+        h1 .big {
+            font-size: 2em;
+            color: #ff3333;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+        }
+
+        .choices {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 40px auto;
+        }
+
+        button {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 3em;
+            border: 2px solid rgba(139, 0, 0, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            background: radial-gradient(circle, rgba(40, 15, 15, 0.9), rgba(20, 5, 5, 0.95));
+            color: #e0e0e0;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            left: 50%;
+            top: 50%;
+            margin-left: -35px;
+            margin-top: -35px;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.2), inset 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        button svg {
+            width: 50px;
+            height: 50px;
+        }
+
+        button:nth-child(1) { transform: translate(0, -140px); }
+        button:nth-child(2) { transform: translate(133px, -43px); }
+        button:nth-child(3) { transform: translate(82px, 114px); }
+        button:nth-child(4) { transform: translate(-82px, 114px); }
+        button:nth-child(5) { transform: translate(-133px, -43px); }
+
+        button:hover {
+            transform: translate(var(--tx), var(--ty)) scale(1.3) !important;
+        }
+
+        button:nth-child(1) { --tx: 0; --ty: -140px; }
+        button:nth-child(2) { --tx: 133px; --ty: -43px; }
+        button:nth-child(3) { --tx: 82px; --ty: 114px; }
+        button:nth-child(4) { --tx: -82px; --ty: 114px; }
+        button:nth-child(5) { --tx: -133px; --ty: -43px; }
+
+        button:hover {
+            opacity: 1;
+            border-color: rgba(255, 50, 50, 0.7);
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.4), inset 0 0 10px rgba(139, 0, 0, 0.3);
+        }
+
+        button:active {
+            opacity: 0.8;
+            box-shadow: 0 0 35px rgba(255, 0, 0, 0.6);
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            box-shadow: none;
+            border-color: rgba(60, 60, 60, 0.3);
+        }
+
+        .hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.3s ease;
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(30, 10, 10, 0.8);
+            border: 1px solid rgba(139, 0, 0, 0.3);
+            border-radius: 8px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .result:not(.hidden) {
+            opacity: 1;
+        }
+
+        .choices-display {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .choice-item {
+            text-align: center;
+        }
+
+        .choice-item label {
+            color: #888;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .choice-item span {
+            display: block;
+            font-size: 1.8em;
+            margin-top: 5px;
+        }
+
+        .result-message {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .result-message.you-win {
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .result-message.computer-wins {
+            color: #FF2020;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+        }
+
+        .result-message.tie {
+            color: #888;
+            text-shadow: 0 0 10px rgba(136, 136, 136, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            color: #ff4444;
+            font-weight: bold;
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .scoreboard {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(20, 10, 10, 0.9);
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(139, 0, 0, 0.4);
+            z-index: 100;
+            min-width: 120px;
+        }
+
+        .score-title {
+            font-weight: bold;
+            font-size: 1em;
+            text-align: center;
+            color: #ff3333;
+            margin-bottom: 8px;
+            border-bottom: 2px solid rgba(139, 0, 0, 0.5);
+            padding-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+
+        .score-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 1em;
+            color: #aaa;
+        }
+
+        .score-row span:last-child {
+            font-weight: bold;
+            color: #FFD700;
+            min-width: 20px;
+            text-align: right;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .score-round {
+            text-align: center;
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 8px;
+            border-top: 1px solid rgba(139, 0, 0, 0.3);
+            padding-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .series-result {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .series-result.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .series-message {
+            font-size: 2.5em;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        .try-again-btn {
+            position: static !important;
+            width: auto !important;
+            height: auto !important;
+            display: inline-block !important;
+            padding: 12px 30px !important;
+            font-size: 1.1em !important;
+            font-family: 'Black Ops One', 'Impact', sans-serif !important;
+            border: 2px solid rgba(139, 0, 0, 0.6) !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            background: linear-gradient(135deg, rgba(139, 0, 0, 0.8), rgba(80, 0, 0, 0.9)) !important;
+            color: #FFD700 !important;
+            font-weight: bold !important;
+            transition: all 0.3s ease !important;
+            left: auto !important;
+            top: auto !important;
+            margin: 0 !important;
+            transform: none !important;
+            opacity: 1 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 3px !important;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.4) !important;
+        }
+
+        .try-again-btn:hover {
+            opacity: 1 !important;
+            transform: scale(1.05) !important;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5) !important;
+            border-color: rgba(255, 50, 50, 0.7) !important;
+        }
+
+        .finish-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 8500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .finish-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .finish-text {
+            font-size: 5em;
+            font-weight: 900;
+            font-family: 'Black Ops One', 'Impact', sans-serif;
+            color: #FF2020;
+            text-shadow: 3px 3px 0 #8B0000;
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            opacity: 0;
+        }
+
+        .finish-text.animate {
+            animation: finishHimIn 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes finishHimIn {
+            0% { opacity: 0; transform: scale(4) rotate(-5deg); }
+            30% { opacity: 1; transform: scale(0.9) rotate(1deg); }
+            50% { transform: scale(1.1) rotate(-1deg); }
+            70% { transform: scale(0.95) rotate(0deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+    </style>
+    <style>
+        @keyframes confettiFall {
+            0% { top: -10px; opacity: 1; transform: rotate(0deg); }
+            50% { opacity: 1; }
+            100% { top: 100vh; opacity: 0; transform: rotate(720deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            15% { transform: translateX(-10px) rotate(-2deg); }
+            30% { transform: translateX(10px) rotate(2deg); }
+            45% { transform: translateX(-8px) rotate(-1deg); }
+            60% { transform: translateX(8px) rotate(1deg); }
+            75% { transform: translateX(-4px); }
+        }
+
+        /* Battle Arena */
+        .battle-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 0, 0, 0.92);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.6s ease;
+        }
+
+        .battle-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .battle-arena {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fighter {
+            font-size: 6em;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            will-change: left, right, opacity;
+        }
+
+        .fighter-left {
+            left: -100px;
+        }
+
+        .fighter-right {
+            right: -100px;
+        }
+
+        .fighter-left.enter {
+            animation: slideInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .fighter-right.enter {
+            animation: slideInRight 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .fighter-left.collide {
+            opacity: 1;
+            animation: chargeLeft 0.6s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+        }
+
+        .fighter-right.collide {
+            opacity: 1;
+            animation: chargeRight 0.6s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+        }
+
+        .fighter.winner {
+            opacity: 1;
+            animation: winnerBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .fighter.loser {
+            animation: loserFall 1s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
+        }
+
+        .crown {
+            position: absolute;
+            font-size: 0.5em;
+            top: -0.6em;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+        }
+
+        .crown.show {
+            animation: crownDrop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .battle-vs {
+            font-size: 4em;
+            font-weight: 900;
+            color: #FF6961;
+            text-shadow: 0 0 20px #FF6961, 0 0 40px #FF6961;
+            opacity: 0;
+            z-index: 1;
+            font-family: 'Black Ops One', 'Impact', sans-serif;
+            letter-spacing: 5px;
+        }
+
+        .battle-vs.show {
+            animation: vsPopIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .battle-flash {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            z-index: 2;
+        }
+
+        .battle-flash.flash {
+            animation: impactFlash 0.5s ease-out forwards;
+        }
+
+        @keyframes slideInLeft {
+            0% { left: -100px; opacity: 0; }
+            20% { opacity: 1; }
+            100% { left: 20%; opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            0% { right: -100px; opacity: 0; }
+            20% { opacity: 1; }
+            100% { right: 20%; opacity: 1; }
+        }
+
+        @keyframes chargeLeft {
+            0% { left: 20%; }
+            70% { left: 44%; }
+            100% { left: 40%; }
+        }
+
+        @keyframes chargeRight {
+            0% { right: 20%; }
+            70% { right: 44%; }
+            100% { right: 40%; }
+        }
+
+        @keyframes vsPopIn {
+            0% { opacity: 0; transform: scale(3) rotate(-10deg); }
+            70% { opacity: 1; transform: scale(0.9) rotate(2deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        @keyframes impactFlash {
+            0% { width: 0; height: 0; opacity: 0.9; }
+            50% { opacity: 0.6; }
+            100% { width: 500px; height: 500px; opacity: 0; }
+        }
+
+        @keyframes winnerBounce {
+            0% { transform: translateY(-50%) scale(1); }
+            40% { transform: translateY(-50%) scale(1.6); }
+            70% { transform: translateY(-50%) scale(1.1); }
+            100% { transform: translateY(-50%) scale(1.3); }
+        }
+
+        @keyframes loserFall {
+            0% { transform: translateY(-50%) rotate(0deg); opacity: 1; }
+            20% { transform: translateY(-50%) rotate(-10deg); opacity: 1; }
+            50% { transform: translateY(-50%) rotate(-20deg); opacity: 0.8; }
+            100% { transform: translateY(250px) rotate(180deg); opacity: 0; }
+        }
+
+        @keyframes crownDrop {
+            0% { top: -2em; opacity: 0; }
+            50% { top: -0.5em; opacity: 1; }
+            70% { top: -0.8em; }
+            85% { top: -0.55em; }
+            100% { top: -0.6em; opacity: 1; }
+        }
+
+        @keyframes announceIn {
+            0% { opacity: 0; transform: scale(0.2); }
+            40% { opacity: 1; transform: scale(1.15); }
+            70% { transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .battle-announce {
+            position: absolute;
+            bottom: 20px;
+            font-size: 3.5em;
+            font-weight: 900;
+            color: #FF2020;
+            text-shadow: 2px 2px 0 #8B0000, 0 0 20px rgba(255,0,0,0.5);
+            font-family: 'Black Ops One', 'Impact', sans-serif;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            opacity: 0;
+        }
+
+        .battle-announce.show {
+            animation: announceIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="scoreboard" id="scoreboard">
+        <div class="score-title">Best of 3</div>
+        <div class="score-row"><span>You</span><span id="playerScore">0</span></div>
+        <div class="score-row"><span>CPU</span><span id="cpuScore">0</span></div>
+        <div class="score-round">Round <span id="roundNum">1</span>/3</div>
+    </div>
+
+    <div class="container">
+        <h1><span class="big">R</span>ock <span class="big">P</span>aper <span class="big">S</span>cissors <span class="big">L</span>izard <span class="big">S</span>pock</h1>
+
+        <div class="choices">
+            <button onclick="play('rock')">🗿</button>
+            <button onclick="play('paper')">📄</button>
+            <button onclick="play('scissors')">✂️</button>
+            <button onclick="play('lizard')">🦎</button>
+            <button onclick="play('spock')">🖖</button>
+        </div>
+
+        <div class="result hidden" id="result">
+            <div class="choices-display">
+                <div class="choice-item">
+                    <label>You</label>
+                    <span id="userChoice"></span>
+                </div>
+                <div class="choice-item">
+                    <label>vs</label>
+                </div>
+                <div class="choice-item">
+                    <label>Computer</label>
+                    <span id="computerChoice"></span>
+                </div>
+            </div>
+            <div class="result-message" id="resultMessage"></div>
+        </div>
+
+        <div class="series-result hidden" id="seriesResult">
+            <div class="series-message" id="seriesMessage"></div>
+            <button class="try-again-btn" onclick="resetGame()">Try Again?</button>
+        </div>
+
+            <div class="loading hidden" id="loading"></div>
+    </div>
+
+    <!-- Series End Overlay -->
+    <div class="series-result hidden" id="seriesResult">
+        <div class="series-message" id="seriesMessage"></div>
+        <button class="try-again-btn" onclick="resetGame()">Try Again?</button>
+    </div>
+
+    <!-- Finish Him Overlay -->
+    <div class="finish-overlay hidden" id="finishOverlay">
+        <div class="finish-text" id="finishText">FINISH HIM!</div>
+    </div>
+
+    <!-- Battle Arena Overlay -->
+    <div class="battle-overlay hidden" id="battleOverlay">
+        <div class="battle-arena">
+            <div class="fighter fighter-left" id="fighterLeft"></div>
+            <div class="battle-vs" id="battleVs">VS</div>
+            <div class="fighter fighter-right" id="fighterRight"></div>
+            <div class="battle-flash" id="battleFlash"></div>
+            <div class="battle-announce" id="battleAnnounce"></div>
+        </div>
+    </div>
+
+    <script>
+        let playerScore = 0;
+        let cpuScore = 0;
+        let round = 0;
+        const maxRounds = 3;
+
+        const winsNeeded = 2;
+
+        function updateScoreboard() {
+            document.getElementById('playerScore').textContent = playerScore;
+            document.getElementById('cpuScore').textContent = cpuScore;
+            document.getElementById('roundNum').textContent = Math.min(round + 1, maxRounds);
+        }
+
+        function isSeriesOver() {
+            return playerScore >= winsNeeded || cpuScore >= winsNeeded;
+        }
+
+        function checkSeriesEnd() {
+            if (isSeriesOver()) {
+                const buttons = document.querySelectorAll('.choices button');
+                buttons.forEach(btn => btn.disabled = true);
+                const seriesResult = document.getElementById('seriesResult');
+                const seriesMessage = document.getElementById('seriesMessage');
+                let msg;
+                if (playerScore >= winsNeeded) {
+                    msg = '🎉 You won this round!';
+                    seriesMessage.style.color = '#77DD77';
+                } else {
+                    msg = '💀 Computer won this round!';
+                    seriesMessage.style.color = '#FF6961';
+                }
+                seriesMessage.textContent = msg;
+                seriesResult.classList.remove('hidden');
+            }
+        }
+
+        function resetGame() {
+            playerScore = 0;
+            cpuScore = 0;
+            round = 0;
+            updateScoreboard();
+            document.getElementById('seriesResult').classList.add('hidden');
+            document.getElementById('result').classList.add('hidden');
+            const buttons = document.querySelectorAll('.choices button');
+            buttons.forEach(btn => btn.disabled = false);
+        }
+
+        function play(choice) {
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            const buttons = document.querySelectorAll('button');
+
+            // Disable buttons and show loading
+            buttons.forEach(btn => btn.disabled = true);
+            resultDiv.classList.add('hidden');
+
+            if (isSeriesOver()) return;
+
+            // Check if this is a deciding round (scores tied 1-1)
+            if (playerScore === 1 && cpuScore === 1) {
+                showFinishHim(() => {
+                    makeMove(choice, resultDiv, loadingDiv, buttons);
+                });
+            } else {
+                makeMove(choice, resultDiv, loadingDiv, buttons);
+            }
+        }
+
+        function showFinishHim(callback) {
+            const overlay = document.getElementById('finishOverlay');
+            const text = document.getElementById('finishText');
+            text.className = 'finish-text';
+            overlay.classList.remove('hidden');
+            setTimeout(() => text.classList.add('animate'), 100);
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                callback();
+            }, 2500);
+        }
+
+        function makeMove(choice, resultDiv, loadingDiv, buttons) {
+            // Call the API
+            fetch(`/${choice}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    // Run the battle animation, then show results
+                    runBattle(data, () => {
+                        // Update scores
+                        if (data.result === 'you win') playerScore++;
+                        if (data.result === 'computer wins') cpuScore++;
+                        round++;
+                        updateScoreboard();
+
+                        // Display result
+                        document.getElementById('userChoice').textContent = toEmoji(data.your_choice);
+                        document.getElementById('computerChoice').textContent = toEmoji(data.computer_choice);
+
+                        const resultMessage = document.getElementById('resultMessage');
+                        const resultClass = data.result === 'you win' ? 'you-win' : 
+                                           data.result === 'tie' ? 'tie' : 
+                                           'computer-wins';
+                        
+                        resultMessage.textContent = data.result.toUpperCase();
+                        resultMessage.className = 'result-message ' + resultClass;
+
+                        resultDiv.classList.remove('hidden');
+
+                        // Confetti on win
+                        if (data.result === 'you win') {
+                            launchConfetti();
+                        }
+
+                        // Funny animation on loss
+                        if (data.result === 'computer wins') {
+                            launchSadRain();
+                        }
+
+                        // Re-enable buttons
+                        buttons.forEach(btn => btn.disabled = false);
+
+                        // Check if series is over
+                        checkSeriesEnd();
+                    });
+                })
+                .catch(error => {
+                    alert('Error: ' + error);
+                    loadingDiv.classList.add('hidden');
+                    buttons.forEach(btn => btn.disabled = false);
+                });
+        }
+
+        function launchSadRain() {
+            const sadEmojis = ['💀', '💀', '🦴', '💀', '🦴', '💀'];
+            for (let i = 0; i < 40; i++) {
+                const drop = document.createElement('div');
+                const emoji = sadEmojis[Math.floor(Math.random() * sadEmojis.length)];
+                drop.textContent = emoji;
+                drop.style.cssText = `
+                    position: fixed;
+                    font-size: ${Math.random() * 20 + 20}px;
+                    left: ${Math.random() * 100}vw;
+                    top: -40px;
+                    pointer-events: none;
+                    z-index: 9999;
+                    animation: confettiFall ${Math.random() * 2 + 2}s ease-in forwards;
+                `;
+                document.body.appendChild(drop);
+                setTimeout(() => drop.remove(), 4000);
+            }
+            const container = document.querySelector('.container');
+            container.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => container.style.animation = '', 500);
+        }
+
+        function runBattle(data, callback) {
+            const overlay = document.getElementById('battleOverlay');
+            const left = document.getElementById('fighterLeft');
+            const right = document.getElementById('fighterRight');
+            const vs = document.getElementById('battleVs');
+            const flash = document.getElementById('battleFlash');
+            const announce = document.getElementById('battleAnnounce');
+
+            // Reset
+            left.className = 'fighter fighter-left';
+            right.className = 'fighter fighter-right';
+            left.style.cssText = '';
+            right.style.cssText = '';
+            vs.className = 'battle-vs';
+            flash.className = 'battle-flash';
+            announce.className = 'battle-announce';
+            announce.textContent = '';
+            // Remove any old crowns
+            document.querySelectorAll('.crown').forEach(c => c.remove());
+
+            left.textContent = toEmoji(data.your_choice);
+            right.textContent = toEmoji(data.computer_choice);
+
+            // Show overlay
+            overlay.classList.remove('hidden');
+
+            // Step 1: Fighters slide in from edges
+            setTimeout(() => {
+                left.classList.add('enter');
+                right.classList.add('enter');
+            }, 200);
+
+            // Step 2: VS appears
+            setTimeout(() => {
+                vs.classList.add('show');
+            }, 1100);
+
+            // Step 3: VS disappears, fighters charge to the middle and collide
+            setTimeout(() => {
+                vs.classList.remove('show');
+                vs.style.opacity = '0';
+                // Set positions to where enter animation ended, then start collide
+                left.style.left = '20%';
+                left.style.opacity = '1';
+                right.style.right = '20%';
+                right.style.opacity = '1';
+                left.classList.remove('enter');
+                right.classList.remove('enter');
+                // Force reflow so the position takes effect before animation
+                void left.offsetWidth;
+                left.classList.add('collide');
+                right.classList.add('collide');
+            }, 1900);
+
+            // Step 4: Impact flash
+            setTimeout(() => {
+                flash.classList.add('flash');
+            }, 2400);
+
+            // Step 5: Winner stays with crown, loser falls
+            setTimeout(() => {
+                const winnerEl = data.result === 'you win' ? left :
+                                 data.result === 'computer wins' ? right : null;
+                const loserEl = data.result === 'you win' ? right :
+                                data.result === 'computer wins' ? left : null;
+
+                if (winnerEl && loserEl) {
+                    winnerEl.classList.add('winner');
+                    loserEl.classList.add('loser');
+                    // Add crown to winner
+                    const crown = document.createElement('span');
+                    crown.className = 'crown';
+                    // Adjust crown for lizard (head is on the right side)
+                    const winnerChoice = winnerEl === left ? data.your_choice : data.computer_choice;
+                    if (winnerChoice === 'lizard') {
+                        crown.style.left = '75%';
+                        crown.style.top = '-0.4em';
+                    }
+                    crown.textContent = '👑';
+                    winnerEl.style.position = 'absolute';
+                    winnerEl.appendChild(crown);
+                    setTimeout(() => crown.classList.add('show'), 100);
+                } else {
+                    // Tie - both bounce
+                    left.classList.add('winner');
+                    right.classList.add('winner');
+                }
+
+                // Announce FATALITY or DRAW
+                const announceText = data.result === 'tie' ? 'DRAW!' : 'FATALITY';
+                announce.textContent = announceText;
+                announce.classList.add('show');
+            }, 2800);
+
+            // Step 6: Close overlay and show results
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                vs.style.opacity = '';
+                callback();
+            }, 4200);
+        }
+
+        function launchConfetti() {
+            const colors = ['#FF6961', '#77DD77', '#FDFD96', '#AEC6CF', '#C3B1E1', '#FFD1DC'];
+            for (let i = 0; i < 80; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.cssText = `
+                    position: fixed;
+                    width: ${Math.random() * 10 + 5}px;
+                    height: ${Math.random() * 10 + 5}px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    left: ${Math.random() * 100}vw;
+                    top: -10px;
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                    pointer-events: none;
+                    z-index: 9999;
+                    animation: confettiFall ${Math.random() * 2 + 1.5}s ease-out forwards;
+                    transform: rotate(${Math.random() * 360}deg);
+                `;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 3500);
+            }
+        }
+
+        function toEmoji(choice) {
+            const emoji = {
+                'rock': '🗿',
+                'paper': '📄',
+                'scissors': '✂️',
+                'lizard': '🦎',
+                'spock': '🖖'
+            };
+            return emoji[choice] || choice;
+        }
+    </script>
+</body>
+</html>

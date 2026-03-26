@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors Lizard Spock</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: capitalize;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .result.hidden {
+            display: none;
+        }
+
+        .choices-display {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .choice-item {
+            text-align: center;
+        }
+
+        .choice-item label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .choice-item span {
+            display: block;
+            font-size: 1.8em;
+            margin-top: 5px;
+        }
+
+        .result-message {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .result-message.you-win {
+            color: #28a745;
+        }
+
+        .result-message.computer-wins {
+            color: #dc3545;
+        }
+
+        .result-message.tie {
+            color: #ffc107;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Rock Paper Scissors Lizard Spock</h1>
+
+        <div class="choices">
+            <button onclick="play('rock')">🪨 Rock</button>
+            <button onclick="play('paper')">📄 Paper</button>
+            <button onclick="play('scissors')">✂️ Scissors</button>
+            <button onclick="play('lizard')">🦎 Lizard</button>
+            <button onclick="play('spock')">🖖 Spock</button>
+        </div>
+
+        <div class="result hidden" id="result">
+            <div class="choices-display">
+                <div class="choice-item">
+                    <label>You</label>
+                    <span id="userChoice"></span>
+                </div>
+                <div class="choice-item">
+                    <label>vs</label>
+                </div>
+                <div class="choice-item">
+                    <label>Computer</label>
+                    <span id="computerChoice"></span>
+                </div>
+            </div>
+            <div class="result-message" id="resultMessage"></div>
+        </div>
+
+        <div class="loading hidden" id="loading">Processing...</div>
+    </div>
+
+    <script>
+        function play(choice) {
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            const buttons = document.querySelectorAll('button');
+
+            // Disable buttons and show loading
+            buttons.forEach(btn => btn.disabled = true);
+            resultDiv.classList.add('hidden');
+            loadingDiv.classList.remove('hidden');
+
+            // Call the API
+            fetch(`/${choice}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    // Display result
+                    document.getElementById('userChoice').textContent = toEmoji(data.your_choice);
+                    document.getElementById('computerChoice').textContent = toEmoji(data.computer_choice);
+
+                    const resultMessage = document.getElementById('resultMessage');
+                    const resultClass = data.result === 'you win' ? 'you-win' : 
+                                       data.result === 'tie' ? 'tie' : 
+                                       'computer-wins';
+                    
+                    resultMessage.textContent = data.result.toUpperCase();
+                    resultMessage.className = 'result-message ' + resultClass;
+
+                    resultDiv.classList.remove('hidden');
+                    loadingDiv.classList.add('hidden');
+
+                    // Re-enable buttons
+                    buttons.forEach(btn => btn.disabled = false);
+                })
+                .catch(error => {
+                    alert('Error: ' + error);
+                    loadingDiv.classList.add('hidden');
+                    buttons.forEach(btn => btn.disabled = false);
+                });
+        }
+
+        function toEmoji(choice) {
+            const emoji = {
+                'rock': '🪨',
+                'paper': '📄',
+                'scissors': '✂️',
+                'lizard': '🦎',
+                'spock': '🖖'
+            };
+            return emoji[choice] || choice;
+        }
+    </script>
+</body>
+</html>
