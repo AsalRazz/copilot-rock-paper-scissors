@@ -49,7 +49,7 @@
         h1 {
             text-align: center;
             color: #c0c0c0;
-            margin-bottom: 30px;
+            margin-bottom: 50px;
             font-size: 1.2em;
             text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
             letter-spacing: 2px;
@@ -578,9 +578,76 @@
         .battle-announce.show {
             animation: announceIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
+
+        .rules-card {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(20, 10, 10, 0.9);
+            border-radius: 8px;
+            padding: 18px 20px;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(139, 0, 0, 0.4);
+            z-index: 100;
+            max-width: 240px;
+            font-size: 0.75em;
+        }
+
+        .rules-title {
+            font-size: 1.2em;
+            color: #ff3333;
+            text-align: center;
+            margin-bottom: 10px;
+            border-bottom: 2px solid rgba(139, 0, 0, 0.5);
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+
+        .rules-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .rules-list li {
+            padding: 3px 0;
+            color: #aaa;
+            font-family: 'Arial', sans-serif;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .rules-list .rule-emoji {
+            display: inline-block;
+            width: 22px;
+            text-align: center;
+            margin-right: 4px;
+        }
+
+        .rules-list .rule-verb {
+            color: #ff4444;
+        }
     </style>
 </head>
 <body>
+    <div class="rules-card">
+        <div class="rules-title">Rules</div>
+        <ul class="rules-list">
+            <li><span class="rule-emoji">✂️</span> <span class="rule-verb">cuts</span> 📄</li>
+            <li><span class="rule-emoji">📄</span> <span class="rule-verb">covers</span> 🗿</li>
+            <li><span class="rule-emoji">🗿</span> <span class="rule-verb">crushes</span> 🦎</li>
+            <li><span class="rule-emoji">🦎</span> <span class="rule-verb">poisons</span> 🖖</li>
+            <li><span class="rule-emoji">🖖</span> <span class="rule-verb">smashes</span> ✂️</li>
+            <li><span class="rule-emoji">✂️</span> <span class="rule-verb">decapitates</span> 🦎</li>
+            <li><span class="rule-emoji">🦎</span> <span class="rule-verb">eats</span> 📄</li>
+            <li><span class="rule-emoji">📄</span> <span class="rule-verb">disproves</span> 🖖</li>
+            <li><span class="rule-emoji">🖖</span> <span class="rule-verb">vaporizes</span> 🗿</li>
+            <li><span class="rule-emoji">🗿</span> <span class="rule-verb">crushes</span> ✂️</li>
+        </ul>
+    </div>
+
     <div class="scoreboard" id="scoreboard">
         <div class="score-title">Best of 3</div>
         <div class="score-row"><span>You</span><span id="playerScore">0</span></div>
@@ -873,11 +940,11 @@
                     // Add crown to winner
                     const crown = document.createElement('span');
                     crown.className = 'crown';
-                    // Adjust crown for lizard (head is on the right side)
+                    // Adjust crown for lizard (head is on the left side of the emoji)
                     const winnerChoice = winnerEl === left ? data.your_choice : data.computer_choice;
                     if (winnerChoice === 'lizard') {
-                        crown.style.left = '75%';
-                        crown.style.top = '-0.4em';
+                        crown.style.left = '40%';
+                        crown.style.top = '-0.3em';
                     }
                     crown.textContent = '👑';
                     winnerEl.style.position = 'absolute';
